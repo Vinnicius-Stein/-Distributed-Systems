@@ -6,16 +6,27 @@ using namespace std;
 #include <string>
 using std::string;
 using std::getline;
+using std::find;
+#include <vector>
 
 int main(int argc, char *argv[]) {
 
-    //if(argc < 2) return -1;
-    ifstream infile;
-    string c;
-    getline(cin, c);
-    read_record();
-    // Recebe o arquivo em "dataset_00_1000.csv"
-    stdin::;
+    vector<string> idatracacao;
+    vector<string> cdtup;
+    vector<string> berco;
+    vector<string> portoatracacao;
+    vector<string> ano.
+    vector<string> mes;
+    vector<string> tipooperacao;
+    vector<string> terminal;
+    vector<string> nacionalidadearmador;
+    vector<string> origem;
+    vector<string> destino;
+    vector<string> cdmercadoria;
+    vector<string> naturezacarga;
+    vector<string> teu;
+    vector<string> sentido;
+    
 
 
     return 0;
