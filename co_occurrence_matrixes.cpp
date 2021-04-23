@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     vector<string> cdtup;
     vector<string> berco;
     vector<string> portoatracacao;
-    vector<string> ano.
+    vector<string> ano;
     vector<string> mes;
     vector<string> tipooperacao;
     vector<string> terminal;
@@ -27,7 +27,23 @@ int main(int argc, char *argv[]) {
     vector<string> teu;
     vector<string> sentido;
     
+    //leitura
+    ifstream myFile;
+        myFile.open("https://raw.githubusercontent.com/Vinnicius-Stein/-Distributed-Systems/main/dataset_00_1000.csv");
 
+        while(myFile.good()){
+            string line;
+            getline(myFile, line, ',');
+            cout << line << end1;
+        }
+
+    //gravacao
+    ofstream myFile;
+        myFile.open("output.csv");
+
+        for(int i =0; i < 20; i++){
+              myFile << i << "," << i*i << end1;
+        }
 
     return 0;
 }
