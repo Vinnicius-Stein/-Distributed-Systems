@@ -1,8 +1,6 @@
 /** Pre processamento - Ocorrencias em database
     Programacao Paralela e Concorrente
-
     Autores:
-
     Mauricio Freire
     Victor Gabriel
     Vinnicius Stein
@@ -28,7 +26,21 @@ using std::getline;
 */
 
 
-void insertUnique (vector<vector<string> > &data, string token, int k, vectro int) {
+void contar(vector<vector<string> > &data, string token, vector<vector<int>> &vet, int k) {
+    int i, count = 0, linha = 0;
+
+    cout << "func contar";
+    for(i = 0; i < data[k].size(); i++) {
+        if ((data[k][i].compare(token) == 0)) {
+            count += 1;
+            return;
+        }
+    }
+    vet[linha++].push_back(count);   
+}
+
+
+void insertUnique (vector<vector<string> > &data, string token, int k) {
 
     int i = 0;
 
@@ -82,17 +94,17 @@ int main(int argc, char *argv[]) {
         while (getline(iss, token, ','))
         {
             insertUnique(data, token, k);
+            contar(data, token, k, cont);
             k++;
         }
         k = 0;
-
     }
+    
 
 /*
     //gravacao
     ofstream myFile;
         myFile.open("output.csv");
-
         for(int i =0; i < 20; i++){
               myFile << i << "," << i*i << end1;
         }
@@ -126,5 +138,3 @@ int main(int argc, char *argv[]) {
 
     // THREAD ESCRITA MATRIZ OCORRENCIA;
     // THREADS PARA CONTAGEM
-
-
