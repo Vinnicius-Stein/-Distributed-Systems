@@ -26,7 +26,7 @@ using std::getline;
 */
 
 
-void contar(vector<vector<string> > &data, string token, vector<vector<int>> &vet, int k) {
+void contar(vector<vector<string> > &data, string token, vector<vector<int>> vet, int k) {
     int i, count = 0, linha = 0;
 
     cout << "func contar";
@@ -36,7 +36,7 @@ void contar(vector<vector<string> > &data, string token, vector<vector<int>> &ve
             return;
         }
     }
-    vet[linha++].push_back(count);   
+    vet[linha++].push_back(count);
 }
 
 
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
         while (getline(iss, token, ','))
         {
             insertUnique(data, token, k);
-            contar(data, token, k, cont);
+            contar(data, token, cont, k);
             k++;
         }
         k = 0;
