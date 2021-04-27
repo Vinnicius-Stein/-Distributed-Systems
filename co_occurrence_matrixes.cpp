@@ -54,20 +54,31 @@ void printOcurrenceMatrix (vector<vector<string> > data, vector<string> header, 
 
     string outputFile;
     for (int i = 0; i < n; i++){
-            outputFile = header[i] + ".txt";
+            outputFile = header[i] + ".csv";
             std::ofstream fout (outputFile.c_str());
             fout << "index," << header[i] << ",ocorrencia" << endl;
 
             for (int j = 0; j < data[i].size() ; j++) { // print all string in first vector of 'arr'
 
-                fout << j << ",";
+                fout << j << ","; //index
                 fout << data[i][j] << ",";
                 fout << cont[i][j] << endl;
             }
     }
     cout << "Terminada a impressao!" << endl;
+
+    idMatrixes(vector<vector<string> > data, vector<string> header, int n)
 }
 
+void idMatrixes(vector<vector<string> > data, vector<string> header, int n) {
+
+    string outputFile;
+    for(int i = 0 ; i < n ; i++){
+        outputFile = header[i] + ".csv";
+        std::ofstream fout(outputFile.c_str());
+        fout << ""
+    }
+}
 
 int main(int argc, char *argv[]) {
 
@@ -121,6 +132,8 @@ int main(int argc, char *argv[]) {
     cout << "Imprimindo matrizes de co-ocorrencia das colunas!" << endl;
 
     printOcurrenceMatrix(data, header, cont, n);
+
+
 
     return 0;
 }
