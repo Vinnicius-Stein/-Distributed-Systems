@@ -1,12 +1,12 @@
 /** Pre processamento - Ocorrencias em database
     Programacao Paralela e Concorrente
+
     Autores:
     Mauricio Freire
     Victor Gabriel
     Vinnicius Stein
     Vitor Oliveira
 */
-
 
 #include <iostream>
 #include <omp.h>
@@ -17,75 +17,121 @@ using std::getline;
 #include <vector>
 #include <sstream>
 #include <cstdlib>
+#include <chrono>
+using namespace std::chrono;
 
 
-/*  Insere elementos unicos
-    data -> vector de strings dos valores da coluna X colunas
+/*  Insere elementos unicos do dataset no 'data' e insere no vetor de contagem 'cont', e/ou retorna o id respectivo do elemento
+    data -> vector de strings dos valores da coluna X colunas unicos
     token -> elemento a ser inseridp
     k -> contador da linha respectiva (coluna do dataset > elemento)
+    cont -> vetor de contador
 */
 
 
-void contar(vector<vector<string> > &data, string token, vector<vector<int>> vet, int k) {
-    int i, count = 0, linha = 0;
 
-    cout << "func contar";
-    for(i = 0; i < data[k].size(); i++) {
-        if ((data[k][i].compare(token) == 0)) {
-            count += 1;
-            return;
+ long long int insertUnique (vector<vector<string> > &data, string token, int k, vector<vector<int> > &cont) {
+
+
+    long long int i;
+
+
+    #pragma openmp parallel
+    {
+        for(i = 0; i < data[k].size(); i++) {
+            if ((data[k][i].compare(token) == 0)) {
+                #pragma omp atomic update
+                cont[k][i] += 1;
+
+                return i;
+            }
+        }
+
+        #pragma omp critical
+        {
+            data[k].push_back(token); // Nao encontrou nenhum valor igual ao token
+            cont[k].push_back(1);
         }
     }
-    vet[linha++].push_back(count);
+    return i;
+
 }
 
 
-void insertUnique (vector<vector<string> > &data, string token, int k) {
+/*  Imprime as matrizes de co-ocorrencia de cada coluna
+    data -> vector de strings dos valores da coluna X colunas unicos
+    header -> cabeçalho do dataset
+    cont -> vector de contador
+    n -> numero de colunas
+*/
 
-    int i = 0;
 
-    for(i = 0; i < data[k].size(); i++) {
-        if ((data[k][i].compare(token) == 0)) {
-                // Contagem? - Encontra um repetido
-             return;
+void printOcurrenceMatrix (vector<vector<string> > data, vector<string> header, vector<vector<int> > cont, int n) {
+
+    string outputFile;
+
+    for (int i = 0; i < n; i++){
+            outputFile = header[i] + ".csv";
+            ofstream fout (outputFile.c_str());
+            fout << "index," << header[i] << ",ocorrencia" << endl;
+
+            for (int j = 0; j < data[i].size() ; j++) {
+                    fout << j << ",";
+                    fout << data[i][j] << ",";
+                    fout << cont[i][j] << endl;
             }
     }
-    data[k].push_back(token); // Nao encontrou nenhum valor igual ao token
-    // cont[k].push_back(0);
+
 }
 
 
 int main(int argc, char *argv[]) {
 
     ifstream database;
+    ofstream ffout ("CodeMatrix.csv");
+    string filename;
 
-    database.open("dataset_00_1000_v3.csv");
-     if (!database.is_open())
+
+    cout << "Informe o nome do dataset (com extensao): ";
+    getline(cin, filename);
+    cout << endl;
+    auto start = high_resolution_clock::now();
+
+    database.open(filename.c_str());
+    if (!database.is_open())
     {
+        cout << "Nao foi possivel abrir o arquivo!";
         std::exit(EXIT_FAILURE);
     }
 
 
-    int k = 0;
     string str;
 
-
-    getline(database, str); // Insere o header em um vetor
+    getline(database, str);
     vector<string> header;
     string head;
     std::istringstream h(str);
-    int n = 0; //contador de quantidade de headers
+    int n = 0; //contador de quantidade de elementos no header (ou colunas)
+
+
+    cout << "Indentificando colunas do dataset..." << endl;
     while (getline(h, head, ','))
         {
             n++;
             header.push_back(head);
         }
 
+    ffout << str << endl; // Insere o header no arquivo de codificacao
+
     // Criacao dos vectors para armazenar valores unicos
+
+    cout << "Colunas identificadas, processando entradas..." << endl;
     vector<vector<string> > data(n);
     vector<vector<int> > cont(n);
 
 
+    int k = 0;
+    cout << "Imprimindo matrizes de codificacao das colunas!" << endl;
     while (getline(database, str))
     {
         std::istringstream iss(str);
@@ -93,48 +139,21 @@ int main(int argc, char *argv[]) {
 
         while (getline(iss, token, ','))
         {
-            insertUnique(data, token, k);
-            contar(data, token, cont, k);
+            ffout << insertUnique(data, token, k, cont) << ";";
             k++;
         }
+        ffout << endl;
         k = 0;
     }
-    
-
-/*
-    //gravacao
-    ofstream myFile;
-        myFile.open("output.csv");
-        for(int i =0; i < 20; i++){
-              myFile << i << "," << i*i << end1;
-        }
-*/
+    cout << "Terminada a matriz de codificacao!" << endl;
+    cout << "Imprimindo matrizes de co-ocorrencia das colunas!" << endl;
+    printOcurrenceMatrix(data, header, cont, n);
+    cout << "Terminada a impressao!" << endl;
 
 
-   // Print de testes
-    for (int q = 0; q < n; q++){
-            cout << header[q] << ": ";
-            for (int t = 0; t < data[q].size() ; t++) { // print all string in first vector of 'arr'
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(stop - start);
+    cout << "Tempo total: " << duration.count() << "ms" << endl;
 
-                cout << data[q][t] << ", ";
-            }
-            cout << endl << endl;
-    }
-        return 0;
+    return 0;
 }
-
-/**TO DO
-    Contagem de ocorrencias
-    Escrita de arquivos de ocorrencias
-    Substituição dos valores em arquivo (em arquivo novo)
- */
-
- //ALGORITMO UNIQUE
-  // IF VECTOR contem ELEMENTO
-    // ACRESCENTA NO CONTADOR
- //ELSE
-    //PUSH.BACK(ELEMENTO)
-    //PUSH.BACK(CONTADOR)
-
-    // THREAD ESCRITA MATRIZ OCORRENCIA;
-    // THREADS PARA CONTAGEM
